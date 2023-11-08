@@ -9,13 +9,9 @@ Implicit None
   Real*8, allocatable                  :: xWC(:,:), yWC(:,:), zWC(:,:)
   Real*8, allocatable                  :: newx(:,:), newy(:,:), newz(:,:)
   Character*4                          :: dum1, dum2, mol
-  Character*4, Dimension(5)            :: type
-!Integer, Parameter                     ::
 Real*8                                 :: drAWC, rAWC, dxAWC, dyAWC, dzAWC, xshift, yshift, zshift
-Real*8                                 :: M1, M2, M5, time, xjk, yjk, zjk, rjk
+Real*8                                 :: M2, time, xjk, yjk, zjk, rjk
 Integer                                :: ii, jj, kk, i, k, j, lc, ts, count, lcnt
-!Real*8, Allocatable, Dimension (:)    ::
-
 
 !!!!!!!!!!!Allocate***************************************************************************************
 allocate (xA(nframes,natoms)); allocate (yA(nframes,natoms)); allocate (zA(nframes,natoms))
@@ -36,7 +32,6 @@ do k = 1, nframes
    Read(10,*)
    do ii = 1, natoms
       Read(10,*)  dum1, xA(k,ii),yA(k,ii), zA(k,ii)
-!      write(20,'(a4,3F20.10)')  dum1, xA(k,ii),yA(k,ii), zA(k,ii)
    enddo
    do jj = 1, nsite-natoms
       Read(10,*)  dum1, xWC(k,jj),yWC(k,jj), zWC(k,jj)
@@ -53,7 +48,6 @@ do k = 1, nframes
   do i = 3, natoms, 4
   do j = 0, 1
   ii = i + j
-  ! Write(*,*) ii
   lcnt = 0
   do jj = 1, nsite-natoms
 
@@ -66,7 +60,7 @@ do k = 1, nframes
 
     drAWC = (dxAWC * dxAWC) + (dyAWC * dyAWC) + (dzAWC * dzAWC)
     rAWC = sqrt (drAWC)
-    ! write(*,*) rAWC
+    
     If (rAWC.le.cutl) Then
 
       If (lcnt.eq.0) Then
@@ -87,18 +81,16 @@ do k = 1, nframes
     End IF
   enddo
   If (lcnt.ne.4) Then
-!  write(*,*) lcnt
   End If
   enddo
   enddo
-!  write(*,*) count-1
 enddo
 
 !----------------Calculate Tetrahedral Rotor Functions--------------------------------
 
 do i = 1, nframes
   do j = 1, count-1, 5
-    M1=0.0; M2=0.0; M5=0.0;
+    M2=0.0
 
     do k =1,4
 
@@ -115,17 +107,13 @@ do i = 1, nframes
       yjk = yjk/rjk
       zjk = zjk/rjk
 
-      M1 = M1 + xjk*yjk*zjk
       M2 = M2 + (5.0*xjk**3 - 3.0*xjk)
-      M5 = M5 + xjk*(yjk**2-zjk**2)
 
     enddo
 
-    M1 = M1 * (3.0/4.0)*sqrt(3.0)
     M2 = M2 * (3.0/40.0)*sqrt(5.0)
-    M5 = M5 * (3.0/8.0)*sqrt(3.0)
-
-    write (50,*) M1, M2, M5
+    
+    write (50,*) M2
 
   enddo
 enddo
